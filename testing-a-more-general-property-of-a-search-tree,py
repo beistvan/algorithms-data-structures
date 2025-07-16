@@ -1,0 +1,38 @@
+import sys
+sys.setrecursionlimit(10**6)
+
+class Node:
+    def __init__(self, key, left, right):
+        self.key = key
+        self.left = left
+        self.right = right
+
+def is_bst(node_index, tree, min_key, max_key):
+    if node_index == -1:
+        return True
+
+    node = tree[node_index]
+    key = node.key
+
+    if (min_key is not None and key < min_key) or (max_key is not None and key >= max_key):
+        return False
+
+    return is_bst(node.left, tree, min_key, key) and is_bst(node.right, tree, key, max_key)
+
+n = int(input())
+tree = []
+has_parent = [False] * n
+
+for i in range(n):
+    key, left, right = map(int, input().split())
+    tree.append(Node(key, left, right))
+    if left != -1:
+        has_parent[left] = True
+    if right != -1:
+        has_parent[right] = True
+
+if n == 0:
+    print("CORRECT")
+else:
+    root = has_parent.index(False)
+    print("CORRECT" if is_bst(root, tree, None, None) else "INCORRECT")
