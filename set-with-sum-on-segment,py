@@ -1,0 +1,65 @@
+import sys
+import bisect
+
+class SegmentSet:
+    def __init__(self):
+        self.data = []
+        self.set_data = set()
+
+    def add(self, x):
+        if x not in self.set_data:
+            bisect.insort_left(self.data, x)
+            self.set_data.add(x)
+
+    def remove(self, x):
+        if x in self.set_data:
+            i = bisect.bisect_left(self.data, x)
+            if i < len(self.data) and self.data[i] == x:
+                self.data.pop(i)
+                self.set_data.remove(x)
+
+    def exists(self, x):
+        return "Found" if x in self.set_data else "Not found"
+
+    def range_sum(self, l, r):
+        left = bisect.bisect_left(self.data, l)
+        right = bisect.bisect_right(self.data, r)
+        return sum(self.data[left:right])
+
+def main():
+    input = sys.stdin.read
+    lines = input().splitlines()
+    n = int(lines[0])
+    queries = lines[1:]
+
+    MOD = 1000000001
+    ss = SegmentSet()
+    result = []
+    last_sum = 0
+
+    for q in queries:
+        if q.startswith('+'):
+            x = int(q[2:])
+            x = (x + last_sum) % MOD
+            ss.add(x)
+        elif q.startswith('-'):
+            x = int(q[2:])
+            x = (x + last_sum) % MOD
+            ss.remove(x)
+        elif q.startswith('?'):
+            x = int(q[2:])
+            x = (x + last_sum) % MOD
+            result.append(ss.exists(x))
+        elif q.startswith('s'):
+            _, l, r = q.split()
+            l = (int(l) + last_sum) % MOD
+            r = (int(r) + last_sum) % MOD
+            if l > r:
+                last_sum = 0
+            else:
+                last_sum = ss.range_sum(l, r)
+            result.append(str(last_sum))
+    print('\n'.join(result))
+
+if __name__ == "__main__":
+    main()
